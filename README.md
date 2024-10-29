@@ -17,6 +17,12 @@ A simple tool for searching and getting values of secrets in Azure KeyVault.
 
 - Everything is the same as the search, but by omitting the `--search`, you will get back the _value_ of the secret that matches `--name`
 
+7. Console URL Helper
+
+- passing `--console` as an argument with a secret name will generate a quick URL to the console page of that secret.
+- this requires a `SECRET_HELPER_CONSOLE_URL` environment variable set, which should look something like:
+  `https://portal.azure.com/#@<AZURE_ACCOUNT>/asset/Microsoft_Azure_KeyVault/Secret/`
+
 ## Useful tips
 
 - Create a bash, zsh, or powershell alias to make this accessible from the terminal(s).

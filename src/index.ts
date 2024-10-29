@@ -1,12 +1,22 @@
 import { getSecret } from './secret-get';
 import { searchSecret } from './secret-search';
 
+const AZURE_URL = process.env.SECRET_HELPER_CONSOLE_URL;
 let isSearch = false;
-let env;
-let secretName;
-let envUrl;
+let openInConsole = false;
+let secretName = '';
+let envUrl = '';
 try {
   process.argv.forEach((arg) => {
+    if (arg === '--console') {
+      if (!AZURE_URL) {
+        console.error(
+          'Please provide a SECRET_HELPER_CONSOLE_URL environment variable'
+        );
+        process.exit(1);
+      }
+      openInConsole = true;
+    }
     if (arg === '--search') {
       isSearch = true;
     }
@@ -33,6 +43,21 @@ if (!envUrl) {
   process.exit(1);
 }
 try {
+  if (openInConsole) {
+    const { exec } = require('child_process');
+    exec(
+      `open ${AZURE_URL}${envUrl}/secrets/${secretName}`,
+      (err: any, stdout: any, stderr: any) => {
+        if (err) {
+          // node couldn't execute the command
+          return;
+        }
+
+        console.log(`${AZURE_URL}${envUrl}/secrets/${secretName}`);
+        process.exit(0);
+      }
+    );
+  }
   if (isSearch) {
     searchSecret(envUrl, secretName).then((secrets) => {
       console.log(secrets);
@@ -40,7 +65,7 @@ try {
     });
   } else {
     getSecret(envUrl, secretName).then((secret) => {
-      console.log(secret);
+      console.log(secret?.value);
       process.exit(0);
     });
   }
